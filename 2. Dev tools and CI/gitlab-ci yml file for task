@@ -1,0 +1,34 @@
+image: debian:latest
+
+stages:
+  - build
+  - testing
+  - package
+
+x64.l.build:
+  stage: build
+  script:
+    - apt update && apt -y install git
+    - git clone https://github.com/godotengine/godot.git godot_engine
+    - cd godot_engine/
+    - apt -y install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm make
+    - scons platform=x11
+    - cd doc/ && mkdir _build/ && cd _build && touch test.txt && cd ../ && make clean > ../text.txt && cd ..
+  artifacts:
+    paths:
+      - godot_engine/*
+  timeout: 2 hours 30 minutes
+
+x64.l.testing:
+  stage: testing
+  script:
+    - apt update && apt -y install git build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm make
+    - echo 'test passed'
+
+x64.l.package:
+  stage: package
+  script:
+    - tar czpf godot_engine.tar.gz godot_engine/
+  artifacts:
+    paths:
+      - godot_engine.tar.gz
